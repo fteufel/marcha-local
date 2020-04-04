@@ -122,6 +122,7 @@ for idx, record in enumerate(table['records']):
     product = airtable_record_to_json(at, record)
     response = wcapi.post("products", product).json()
 
+    print(product['name'])
     #def update(self, table_name, record_id, data):
     #    if check_string(table_name) and check_string(record_id):
     #        url = posixpath.join(table_name, record_id)
@@ -143,7 +144,6 @@ for idx, record in enumerate(table['records']):
     fields = {'woocommerce_ID': str(response['id'])}
     print(response['id'])
     resp = at.update_custom(TABLE_NAME,record['id'], fields)
-    print(resp)
 print("done : ) :) :  )")
 
 response = wcapi.post("products", product).json()
