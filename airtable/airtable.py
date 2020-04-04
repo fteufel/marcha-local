@@ -148,6 +148,21 @@ class Airtable(object):
             return self.__request('PATCH', url,
                                   payload=json.dumps(payload))
 
+    def update_custom(self, table_name, record_id, data):
+        """
+        standard update is broken, API endpoint is the table not the record
+        """
+        if check_string(table_name) and check_string(record_id):
+
+            payload = create_payload(data)
+            payload['id'] = record_id
+            print(json.dumps({'records':[payload]}))
+            return self.__request('PATCH', table_name, payload=json.dumps({'records':[]}))
+
+        #{"records": [{"fields": {"woocommerce_ID": 522}, "id": "rec3yRUsZM170trW3"}]}
+        #{"records": [{"id": "recsUE94Y1ITNAyzs", "fields": {"Product": "Book A", "Stock": 2,}},]
+
+
     def update_all(self, table_name, record_id, data):
         if check_string(table_name) and check_string(record_id):
             url = posixpath.join(table_name, record_id)
