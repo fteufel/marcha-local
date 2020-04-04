@@ -148,6 +148,28 @@ class Airtable(object):
             return self.__request('PATCH', url,
                                   payload=json.dumps(payload))
 
+    def update_custom(self, table_name, record_id, data):
+        """
+        standard update is broken, API endpoint is the table not the record.
+        works now, problem was in the url and the payload needs other format. 
+        maybe modularize sometime.
+        """
+        if check_string(table_name) and check_string(record_id):
+
+            payload = create_payload(data)
+            payload['id'] = record_id
+            payload_array = json.dumps({'records':[payload]})
+            print(payload_array)
+            headers = self.headers
+            headers.update({'Content-type': 'application/json'})      
+            print(self.base_url+"/"+table_name)
+
+            r = requests.request('PATCH',self.base_url+"/"+table_name, data = payload_array, headers= headers)
+
+            return r
+
+
+
     def update_all(self, table_name, record_id, data):
         if check_string(table_name) and check_string(record_id):
             url = posixpath.join(table_name, record_id)

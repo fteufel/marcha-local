@@ -8,6 +8,9 @@ load records from airtable, reformat and push as product into woocommerce
 from airtable import airtable #https://github.com/josephbestjames/airtable.py
 from IPython import embed
 from woocommerce import API #https://github.com/woocommerce/wc-api-python
+from datetime import datetime
+import posixpath
+import dateutil.parser
 
 ### APIs
 API_KEY = 'keyO4pjsHsgtCPofA'
@@ -15,19 +18,17 @@ BASE_ID = 'app1fFJJYvoUtSQUL'
 TABLE_NAME = 'Inventory'
 
 wcapi = API(
-    url="http://marchalocal.ch",
-    consumer_key= 'ck_8239347f0b5b3cf8099e3eff1dc0ef398f23cfa8',
-    consumer_secret="cs_3360619c363b5d00a254d6b9636b11a0b5a8c63b",
+    url="https://marchalocal.ch",
+    consumer_key= 'ck_7e032301f2b9c73f376bf3f608b7274ca27ce020',
+    consumer_secret="cs_6ffda704beefd69e0f771b8bfb01297a53101bf8",
     wp_api=True,
     version="wc/v3",
     timeout=15
 )
 
-### Table import
-at = airtable.Airtable(BASE_ID, API_KEY)
-table = at.get(TABLE_NAME)
-#table = at.get(TABLE_NAME)
-#vendors_table = at.get('Vendors')
+
+
+
 
 #########################################MORE SETUP##############################################################################
 ### Function declarations
@@ -48,7 +49,7 @@ def airtable_record_to_json(database, record):
     store = vendor_info['Store']
     group_id =  vendor_info['Groups'][0] # is still in array, could also loop for multiple group assignments
     group_info = database.get('Location', record_id=group_id, limit=0, offset=None, filter_by_formula=None, view=None, max_records=0, fields=[])['fields']
-    group_name = group_info['Name']
+    group_name = group_info['Location']
     
     #reformat
     data = {
@@ -99,30 +100,51 @@ def airtable_record_to_json(database, record):
 #################################################################ACTUAL CODE DOING STUFF##################################
 #super naive implementation, iterate over all records and update
 
+### Table import
+at = airtable.Airtable(BASE_ID, API_KEY)
+table = at.get(TABLE_NAME, filter_by_formula= None)
+
 ### Record: dict for each entry in Table
 for idx, record in enumerate(table['records']):
     print("Parsing entry {} of {}".format(idx+1, len(table["records"])))
 
+    #TODO filter by time, don't update everything
+    edit_time = record['fields']['Last modified time']
+    timestamp = dateutil.parser.parse(edit_time)
+    last_update_time = datetime.now()
+    
+    #if timestamp < last_update_time:
 
-    ### Used in the other function, could be deleted
-    # product = record['fields']['Product']
-    # price   = record['fields']['Price']
-    # stock   = record['fields']['Stock']
-
-    # print("product: {}, price: {}, stock: {}".format(product, price, stock))
-
-    # #relational lookups
-    # merchant_record = record['fields']['Store'][0] #array again
-
-    # vendor_info = at.get('Vendors', record_id=merchant_record, limit=0, offset=None, filter_by_formula=None, view=None, max_records=0, fields=[])['fields']
-    # store = vendor_info['Store']
-    # group_id =  vendor_info['Groups'][0] # is still in array, could also loop for multiple group assignments
-    # group_info = at.get('Location', record_id=group_id, limit=0, offset=None, filter_by_formula=None, view=None, max_records=0, fields=[])['fields']
-    # group_name = group_info['Name']
-
-    # print("store: {}, group name: {}".format(store, group_name))
+    #delete the old version of the product
+    woocommerce_ID = record['fields']['woocommerce_ID']
+    wcapi.delete(f"products/{woocommerce_ID}", params={"force": True}).json()
 
     product = airtable_record_to_json(at, record)
-    # print(wcapi.post("products", product).json())
-    wcapi.post("products", product).json()
+    response = wcapi.post("products", product).json()
+
+    print(product['name'])
+    #def update(self, table_name, record_id, data):
+    #    if check_string(table_name) and check_string(record_id):
+    #        url = posixpath.join(table_name, record_id)
+    #        payload = create_payload(data)
+    #        return self.__request('PATCH', url,
+    #
+    # self.headers.update({'Content-type': 'application/json'})
+    #    r = requests.request(method,
+    #                         posixpath.join(self.base_url, url),
+    #                         params=params,
+    #                         data=payload,
+    #                         headers=self.headers)
+    #    if r.status_code == requests.codes.ok:
+    #        return r.json(object_pairs_hook=self._dict_class)                              payload=json.dumps(payload))
+
+
+
+    #update ID in airtable
+    fields = {'woocommerce_ID': str(response['id'])}
+    print(response['id'])
+    resp = at.update_custom(TABLE_NAME,record['id'], fields)
 print("done : ) :) :  )")
+
+response = wcapi.post("products", product).json()
+response['id']
