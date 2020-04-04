@@ -150,17 +150,24 @@ class Airtable(object):
 
     def update_custom(self, table_name, record_id, data):
         """
-        standard update is broken, API endpoint is the table not the record
+        standard update is broken, API endpoint is the table not the record.
+        works now, problem was in the url and the payload needs other format. 
+        maybe modularize sometime.
         """
         if check_string(table_name) and check_string(record_id):
 
             payload = create_payload(data)
             payload['id'] = record_id
-            print(json.dumps({'records':[payload]}))
-            return self.__request('PATCH', table_name, payload=json.dumps({'records':[]}))
+            payload_array = json.dumps({'records':[payload]})
+            print(payload_array)
+            headers = self.headers
+            headers.update({'Content-type': 'application/json'})      
+            print(self.base_url+"/"+table_name)
 
-        #{"records": [{"fields": {"woocommerce_ID": 522}, "id": "rec3yRUsZM170trW3"}]}
-        #{"records": [{"id": "recsUE94Y1ITNAyzs", "fields": {"Product": "Book A", "Stock": 2,}},]
+            r = requests.request('PATCH',self.base_url+"/"+table_name, data = payload_array, headers= headers)
+
+            return r
+
 
 
     def update_all(self, table_name, record_id, data):

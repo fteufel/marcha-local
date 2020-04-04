@@ -18,9 +18,9 @@ BASE_ID = 'app1fFJJYvoUtSQUL'
 TABLE_NAME = 'Inventory'
 
 wcapi = API(
-    url="http://marchalocal.ch",
-    consumer_key= 'ck_8239347f0b5b3cf8099e3eff1dc0ef398f23cfa8',
-    consumer_secret="cs_3360619c363b5d00a254d6b9636b11a0b5a8c63b",
+    url="https://marchalocal.ch",
+    consumer_key= 'ck_7e032301f2b9c73f376bf3f608b7274ca27ce020',
+    consumer_secret="cs_6ffda704beefd69e0f771b8bfb01297a53101bf8",
     wp_api=True,
     version="wc/v3",
     timeout=15
@@ -140,7 +140,7 @@ for idx, record in enumerate(table['records']):
 
 
     #update ID in airtable
-    fields = {'woocommerce_ID': response['id']}
+    fields = {'woocommerce_ID': str(response['id'])}
     print(response['id'])
     resp = at.update_custom(TABLE_NAME,record['id'], fields)
     print(resp)
