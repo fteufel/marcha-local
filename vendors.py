@@ -1,6 +1,5 @@
 from airtable import airtable #https://github.com/josephbestjames/airtable.py
 from woocommerce import API #https://github.com/woocommerce/wc-api-python
-import json
 
 ### APIs
 API_KEY = 'keyO4pjsHsgtCPofA'
@@ -48,4 +47,6 @@ wcapi = API(
 #         if not vendors.get(store_name):
 #                 vendors[store_name] = store_id
 
-print(wcapi.get("orders").json())   
+# print(wcapi.get("orders").json())   
+
+
