@@ -1,0 +1,53 @@
+
+{% load leaflet_tags %}
+{% load static %}
+<html>
+  <head>
+    {% leaflet_js %}
+    {% leaflet_css %}
+    <style>
+      .leaflet-container { height: 100%; }
+    </style>
+    <script type="text/javascript">
+    </script>
+    <link rel="stylesheet" type="text/css" href="{%static 'gmapsdisplay/routing/leaflet-routing-machine.css' %}">
+    <script type="text/javascript" src="{%static 'gmapsdisplay/routing/leaflet-routing-machine.js' %}"></script>
+    <style>
+
+    .leaflet-container {  /* all maps */
+        width:  1000px;
+        height: 600px;
+    }
+
+    #specialbigmap {
+        height: 800px;
+    }
+
+    /* Resize the "display_raw" textbox */
+    .django-leaflet-raw-textarea {
+        width: 100%;
+    }
+
+    </style>
+
+  </head>
+  <body>
+    <script type="text/javascript">
+        function map_init_basic (map, options) {
+            L.marker([50.5, 30.5]).addTo(map);
+            
+            var latlngsfeed = {{stop_list}}
+            
+
+            L.Routing.control({
+            waypoints: latlngsfeed
+            }).addTo(map);
+
+        }
+    </script>
+    
+    {% leaflet_map "yourmap" callback="window.map_init_basic" %}
+    <h1>Marcha local testmap</h1>
+    
+  </body>
+</html>
