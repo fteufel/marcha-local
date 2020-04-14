@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Waypoints in Directions</title>
+    <style>
+     
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+        float: left;
+        width: 100%;
+        height: 100%;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script>
+      function initMap() {
+        var directionsService = new google.maps.DirectionsService;
+        var directionsRenderer = new google.maps.DirectionsRenderer;
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 6,
+        });
+        directionsRenderer.setMap(map);
+        calculateAndDisplayRoute(directionsService, directionsRenderer);
+      }
+var addresses = 'RepeatingGroup Order's order_selection's Delivery Address's formatted address join with <SEP>';
+console.log(addresses)
+addresses= addresses.split("<SEP>")
+var waypoints= [];
+var i;
+for (i = 0; i < addresses.length; i++) {
+var waypoint= {"location" : addresses[i], stopover:true};
+waypoints.push(waypoint);
+}
+
+      var origin = "Klingelbergstrasse 87, Basel";
+      var destination = "Klingelbergstrasse 87, Basel";
+console.log(origin);
+console.log(destiantion);
+      function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+        directionsService.route({
+          origin: origin,
+          destination: destination,
+          waypoints: waypoints,
+          optimizeWaypoints: true,
+          travelMode: 'DRIVING'
+        }, function(response, status) {
+          if (status === 'OK') {
+            directionsRenderer.setDirections(response);
+            var route = response.routes[0];
+
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        });
+      }
+    </script>
+    <script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCb0yTJ4Bz6Ch9-PQoIyS8pANQsxDWGCXQ&callback=initMap">
+    </script>
+  </body>
+</html>
